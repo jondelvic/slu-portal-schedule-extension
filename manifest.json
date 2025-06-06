@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "SLU Portal Schedule Converter",
+    "version": "1.0.0",
+    "description": "Converts the given schedule from your SLU Portal Schedule tab into common file formats compatible with calendar applications",
+    "content_scripts": [
+        {
+            "js":["scripts/content.js"],
+            "matches": [
+                "https://samcis.slu.edu.ph/students/classsched" 
+            ]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    }
+}
