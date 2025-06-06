@@ -3,6 +3,12 @@
     "name": "SLU Portal Schedule Converter",
     "version": "1.0.0",
     "description": "Converts the given schedule from your SLU Portal Schedule tab into common file formats compatible with calendar applications",
+    "icons": {
+        "16": "images/16-icon.png",
+        "32": "images/32-icon.png",
+        "48": "images/48-icon.png",
+        "128": "images/128-icon.png"
+    },
     "content_scripts": [
         {
             "js":["scripts/content.js"],
