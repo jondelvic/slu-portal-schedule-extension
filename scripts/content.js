@@ -27,9 +27,10 @@ console.log("Number of courses enrolled: " + courseCount);
 // get data 
 console.log("Schedule details of enrolled courses: ")
 for (let i = 0; i < courseCount; i++) {
-    console.log(tbodyRows.item(i).innerText.replaceAll(/\s/g,',')); // remove whitespaces and replace with comma
+    console.log(tbodyRows.item(i).innerText.replaceAll(/\t/g,',')); // remove whitespaces and replace with comma
 }
 
 // .csv PROCESSING 
+// TODO Remove hyphen in between of time schedule for start time and end time
 
 // .ics PROCESSING
