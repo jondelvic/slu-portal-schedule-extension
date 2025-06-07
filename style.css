@@ -1,0 +1,96 @@
+/* COLORS
+    white background
+    #073066 purple?/blue? idk im colorblind
+    #F6C500 yellow ata
+*/
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+    border: #073066 solid;
+    border-width: 25px;
+    overflow: hidden;
+    display: block;
+}
+
+body {
+    width: 400px;
+    height: 315px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header {
+    margin-top: 12px;
+    font-family: "Montserrat", sans-serif;
+    cursor: default;
+}
+ 
+#title {
+    text-align: center;
+    font-weight: 800;
+    color: #073066;
+}
+
+.description {
+    text-align: center;
+    font-size: 11px;
+}
+
+.main-section {    
+    font-family: "Montserrat", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+button {
+    width: 200px;
+    height: 30px;
+    margin-bottom: 12px;
+    background-color: #073066;
+    color: #F6C500;
+    border: none;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+button:hover {
+    color: #073066;
+    background-color: #F6C500;
+}
+
+footer {
+    background-color: #073066;
+    color: white;
+    font-family: "Montserrat", sans-serif;
+    position: absolute;
+    bottom: 20; /* accommodates body stroke */
+    width: 100%;
+    text-align: center;
+    padding-top: 18px;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    text-decoration: underline;
+}

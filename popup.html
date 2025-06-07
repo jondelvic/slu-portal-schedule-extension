@@ -1,11 +1,30 @@
 <html>
-    <!-- Extension Title Header -->
-    <h1>SLU Portal Schedule Converter</h1>
+    <head>
+        <link rel="stylesheet" href="style.css">
 
-    <!-- Short description -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    </head>
 
-    <!-- Button 1: to iCalendar (.ics) -->
-    <!-- Button 2: to CSV (.csv) -->
+    <body>
+        <div class="header">
+            <h2 id="title">SLU Portal Schedule Converter</h2>
+        </div>
+
+        <div class="main-section">
+            <div class="description">Click on your desired file format:</div>
+            <div class="btn-container">
+                <button id="ics-btn">Convert to iCalendar (.ics)</button>
+                <button id="csv-btn">Convert to CSV (.csv)</button>
+                <button id="json-btn">Convert to JSON (.json)</button>
+            </div>        
+        </div>
+
+        <footer>
+            <a href="https://github.com/jondelvic" target="_blank">Developed by Jon Delvic Calub</a>
+        </footer>
+    </body>
 
     <script src="content.js"></script>
 </html>
