@@ -1,5 +1,3 @@
-// npm package tabletojson could be used
-
 const table = document.querySelectorAll("table.mws-table");
 const thead = document.querySelectorAll("table.mws-table > thead > tr > th"); // pwede pala ito
 const tbody = document.getElementsByTagName("tbody"); 
@@ -8,15 +6,6 @@ const tbody = document.getElementsByTagName("tbody");
 // console.log(table[0]); 
 // console.log(thead); 
 // console.log(tbody[0]);
-
-// get headers
-const tableHeaders = [];
-for (let i = 0; i < thead.length; i++) {
-    // console.log(thead.item(i).innerText);
-    tableHeaders.push(thead.item(i).innerText);
-}
-
-console.log(tableHeaders); // just realized that i might not be needing the headers after all lolz (unless maybe i implement json conversion)
 
 // get number of subjects
 // Count the number of <tr> elements in <tbody> - 1 (total units)
@@ -32,12 +21,46 @@ for (let i = 0; i < courseCount; i++) {
     courseScheduleDetails.push(tbodyRows.item(i).innerText.replaceAll(/\t/g,','));
 }
 
+// get headers
+const tableHeaders = [];
+for (let i = 0; i < thead.length; i++) {
+    // console.log(thead.item(i).innerText);
+    tableHeaders.push(thead.item(i).innerText);
+}
+
+console.log(tableHeaders); // just realized that i might not be needing the headers after all lolz (unless maybe i implement json conversion)
+
+
 console.log(courseScheduleDetails);
 
 /* NOTES:
     - If marked as DAILY, event frequency should be monday to saturday
 */
 
+// Variables for schedule details
+const eventTitle = "";
+const startDate = "";
+const endDate = "";
+const startTime = "";
+const endTime = "";
+const description = "";
+const room = "";
+
 // function for .csv processing
+function exportToCSV() {
+    const csvHeaders = ["Subject", "Start Date", "End Date", "Start Time", "End Time", "Description", "Location"];
+
+    let csvContent = csvHeaders.join(",");
+
+    // test appending of current unrefined schedule details
+    for (let i = 0; i < courseCount; i++) {
+        csvContent += "\n";
+        csvContent += courseScheduleDetails.join(",");
+    }
+
+    console.log(csvContent);
+}
+
+exportToCSV();
 
 // function for .ics processing
