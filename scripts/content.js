@@ -1,5 +1,3 @@
-// npm package tabletojson could be used
-
 const table = document.querySelectorAll("table.mws-table");
 const thead = document.querySelectorAll("table.mws-table > thead > tr > th"); // pwede pala ito
 const tbody = document.getElementsByTagName("tbody"); 
@@ -38,6 +36,19 @@ console.log(courseScheduleDetails);
     - If marked as DAILY, event frequency should be monday to saturday
 */
 
+// Variables for schedule details
+const eventTitle = "";
+const startDate = "";
+const endDate = "";
+const startTime = "";
+const endTime = "";
+const description = "";
+const room = "";
+
+// CSV Headers accordingly
+const csvHeaders = "Subject,Start Date,End Date,Start Time, End Time,Description,Location"
+
 // function for .csv processing
+
 
 // function for .ics processing
