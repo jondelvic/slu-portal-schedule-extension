@@ -36,12 +36,13 @@ for (let i = 0; i < courseCount; i++) {
 }
 
 // CSV Processing (.csv)
+// note: removed end date due to csv not supporting recurring events
 function exportToCSV() {
-    const csvHeaders = ["Subject", "Start Date", "End Date", "Start Time", "End Time", "Description", "Location"];
+    const csvHeaders = ["Subject", "Start Date", "Start Time", "End Time", "Description", "Location"];
 
     let subject = [];
     let startDate = "0" + currentDate;
-    let endDate = shortTermEndDate;
+    // let endDate = shortTermEndDate;
     let startTime = [];
     let endTime = [];
     let description = [];
@@ -50,32 +51,51 @@ function exportToCSV() {
     let csvContent = csvHeaders.join(",");
 
     for (let i = 0; i < courseScheduleDetails.length; i++) {
+        csvContent += "\n";
+
         let scheduleElements = courseScheduleDetails[i].split(",");
 
         subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); 
+        csvContent += subject[i] + ",";
+
+        csvContent += startDate + ",";
 
         let startTimeString = scheduleElements[4].substring(0, 2) + ":" + scheduleElements[4].substring(2, 4) + " " + scheduleElements[4].substring(12, 14); // this could have an issue with am/pm overlap
         startTime.push(startTimeString);
+        csvContent += startTime[i] + ",";
 
         let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 14);
         endTime.push(endTimeString);
+        csvContent += endTime[i] + ","
 
         description.push(scheduleElements[2]);
+        csvContent += description[i] + ",";
 
         room.push(scheduleElements[6]);
+        csvContent += room[i];
     }
 
     console.log(csvContent);
-    console.log(subject);
-    console.log(startTime);
-    console.log(endTime);
-    console.log(description);
-    console.log(room);
 
-    console.log(startDate);
-    console.log(endDate);
+    const download = (data) => {
+        const csvBlob = new Blob([data], {type: 'text/csv;charset=utf-8'});
+        const csvURL = URL.createObjectURL(csvBlob);
+
+        const a = document.createElement('a');
+
+        a.href = csvURL;
+        a.download = 'slu-portal-schedule.csv';
+
+        a.click();
+    }
+
+    download(csvContent); 
+
+    return csvContent;
 }
 
 exportToCSV();
+
+// document.getElementById('csv-btn').addEventListener('click', exportToCSV());
 
 // TODO: iCalendar Processing (.ics)

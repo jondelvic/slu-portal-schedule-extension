@@ -11,10 +11,11 @@
     },
     "content_scripts": [
         {
-            "js":["scripts/content.js"],
             "matches": [
-                "https://samcis.slu.edu.ph/students/classsched" 
-            ]
+                "<all_urls>"
+            ],
+            "js": ["scripts/content.js"],
+            "world": "MAIN"
         }
     ],
     "action": {
