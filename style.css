@@ -23,7 +23,7 @@ body {
 }
 
 .header {
-    margin-top: 12px;
+    margin-top: 17px;
     cursor: default;
 }
  
@@ -75,17 +75,13 @@ footer {
     background-color: #073066;
     color: white;
     position: absolute;
-    bottom: 20; /* accommodates body stroke */
+    bottom: 12; /* accommodates body stroke */
     width: 100%;
     text-align: center;
-    padding-top: 18px;
+    padding-top: 12px;
 }
 
-a {
-    text-decoration: none;
-    color: white;
-}
-
-a:hover {
-    text-decoration: underline;
+#github-logo {
+    width: 20px;
+    height: 20px;
 }
