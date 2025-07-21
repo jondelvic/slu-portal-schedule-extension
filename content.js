@@ -35,6 +35,10 @@ for (let i = 0; i < courseCount; i++) {
     courseScheduleDetails.push(courseSchedule);
 }
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log(request.data)
+});
+
 // CSV Processing (.csv)
 // note: removed end date due to csv not supporting recurring events
 function exportToCSV() {
@@ -94,8 +98,12 @@ function exportToCSV() {
     return csvContent;
 }
 
-exportToCSV();
+// exportToCSV();
 
 // document.getElementById('csv-btn').addEventListener('click', exportToCSV());
+
+// devlog: July 21, 2025: it's been 32 days since i've last touched this project dahil sa potang short term sched na yan 
+//          and i then realize that i need to separate the content.js from the javsacript for the popup bobo ampota kaya nagnnull yung getELementbyId
+//          my goal tonite is to fix that button issue then start analyzing how i format for .ics file exportations
 
 // TODO: iCalendar Processing (.ics)
