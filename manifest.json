@@ -14,11 +14,17 @@
             "matches": [
                 "<all_urls>"
             ],
-            "js": ["content.js"],
-            "world": "MAIN"
+            "js": ["content.js"]
         }
     ],
-    "permissions": ["activeTab", "scripting", "downloads"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "externally_connectable": {
+        "matches": ["https://*.slu.edu.ph/*"]
+    },
+    "permissions": ["activeTab", "runtime", "scripting", "tabs"],
+    "host_permissions": ["https://*"],
     "action": {
         "default_popup": "popup/popup.html"
     }

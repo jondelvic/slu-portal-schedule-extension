@@ -1,3 +1,11 @@
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log(request);
+
+    if (request.message === "csv") {
+        exportToCSV();
+    }
+});
+
 // AY 2024 - 2025 (this must be updated per AY)
 let firstSemEndDate = "12/16/2024" // first semester
 let secondSemEndDate = "05/22/2025" // second semester
@@ -35,17 +43,18 @@ for (let i = 0; i < courseCount; i++) {
     courseScheduleDetails.push(courseSchedule);
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log(request.data)
-});
-
 // CSV Processing (.csv)
 // note: removed end date due to csv not supporting recurring events
 function exportToCSV() {
     const csvHeaders = ["Subject", "Start Date", "Start Time", "End Time", "Description", "Location"];
 
     let subject = [];
-    let startDate = "0" + currentDate;
+    let startDate = currentDate;
+
+    if (startDate < 10) {
+        startDate = "0" + currentDate;
+    }
+    
     // let endDate = shortTermEndDate;
     let startTime = [];
     let endTime = [];
@@ -105,5 +114,9 @@ function exportToCSV() {
 // devlog: July 21, 2025: it's been 32 days since i've last touched this project dahil sa potang short term sched na yan 
 //          and i then realize that i need to separate the content.js from the javsacript for the popup bobo ampota kaya nagnnull yung getELementbyId
 //          my goal tonite is to fix that button issue then start analyzing how i format for .ics file exportations
+
+// devlog: July 23, 2025: holy fuck i just needed a fucking background script for the service-worker that will listen to events from the 
+//          popup.js omygosh the button is werking now yiopeeee idk if its just my reading comprehension against the documentation if i missed it or the docs suck
+//          SOURCE: https://github.com/TUTORIEX/chrome-extension-101
 
 // TODO: iCalendar Processing (.ics)
