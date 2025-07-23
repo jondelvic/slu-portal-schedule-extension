@@ -1,8 +1,18 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log(request);
 
-    if (request.message === "csv") {
-        exportToCSV();
+    switch (request.message) {
+        case "ics":
+            alert("Exporting to iCalendar is not yet available. \nCurrently working on it!");
+            break;
+        case "csv":
+            exportToCSV();
+            break;
+        case "json":
+            alert("Exporting to JSON is not yet available.");
+            break;
+        default:
+            console.log(request.message);
     }
 });
 
@@ -54,7 +64,7 @@ function exportToCSV() {
     if (startDate < 10) {
         startDate = "0" + currentDate;
     }
-    
+
     // let endDate = shortTermEndDate;
     let startTime = [];
     let endTime = [];
@@ -107,10 +117,6 @@ function exportToCSV() {
     return csvContent;
 }
 
-// exportToCSV();
-
-// document.getElementById('csv-btn').addEventListener('click', exportToCSV());
-
 // devlog: July 21, 2025: it's been 32 days since i've last touched this project dahil sa potang short term sched na yan 
 //          and i then realize that i need to separate the content.js from the javsacript for the popup bobo ampota kaya nagnnull yung getELementbyId
 //          my goal tonite is to fix that button issue then start analyzing how i format for .ics file exportations
@@ -120,3 +126,6 @@ function exportToCSV() {
 //          SOURCE: https://github.com/TUTORIEX/chrome-extension-101
 
 // TODO: iCalendar Processing (.ics)
+function exportToICS() {
+
+}
