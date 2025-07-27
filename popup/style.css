@@ -71,6 +71,17 @@ button:hover {
     background-color: #F6C500;
 }
 
+#csv-btn {
+    height: 40px;
+}
+
+.warning1 {
+    font-weight: 200;
+    color: white;
+    font-size: 9px;
+    font-style: italic;
+}
+
 footer {
     background-color: #073066;
     color: white;

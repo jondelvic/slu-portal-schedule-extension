@@ -1,3 +1,7 @@
+/* TODO: Check the schedule under the DAYS header from the portal if it is for this day. 
+If not, don't process for csv and only append the one that's scheduled 
+(e.g., THFS (Thursday, Friday, Saturday), DAILY (Monday to Saturday),  TTHS (Tuesday, Thursday, Saturday)) */
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log(request);
 
@@ -23,6 +27,9 @@ let shortTermEndDate = "07/22/2025" // short term
 
 // Get current date
 const currentDate = new Date().toLocaleDateString();
+
+// Get current day (0 - 6; Sunday - Saturday)
+const currentDayOfTheWeek = new Date().getDay();
 
 // Read class schedule table from schedule tab of portal
 const table = document.querySelectorAll("table.mws-table");
@@ -70,13 +77,39 @@ function exportToCSV() {
     let endTime = [];
     let description = [];
     let room = [];
+    let dayOfTheWeek = [];
 
     let csvContent = csvHeaders.join(",");
 
+    console.log("Today is a " + currentDayOfTheWeek);
     for (let i = 0; i < courseScheduleDetails.length; i++) {
         csvContent += "\n";
 
         let scheduleElements = courseScheduleDetails[i].split(",");
+
+        dayOfTheWeek.push(scheduleElements[5]);
+        
+        let days = dayOfTheWeek[i].split('').join(',');
+        console.log("Weekly Schedule: ");
+
+        days = days.split(',');
+        console.log(days);
+
+        let weeklySchedule = [];
+
+        // checking for 'T' and 'TH' case
+        for (let j = 0; j < days.length; j++) {
+            if (days[j] == 'T') {
+                console.log("This is a tuesday? or a thursday?");
+                if (days[j + 1] == 'H') {
+                    console.log("This is a thursday!");
+                    weeklySchedule.push(days[j] + days[j + 1]);
+                    console.log(weeklySchedule);
+                } else {
+                    console.log("This is a tuesday!");
+                }
+            } 
+        }
 
         subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); 
         csvContent += subject[i] + ",";
@@ -116,14 +149,6 @@ function exportToCSV() {
 
     return csvContent;
 }
-
-// devlog: July 21, 2025: it's been 32 days since i've last touched this project dahil sa potang short term sched na yan 
-//          and i then realize that i need to separate the content.js from the javsacript for the popup bobo ampota kaya nagnnull yung getELementbyId
-//          my goal tonite is to fix that button issue then start analyzing how i format for .ics file exportations
-
-// devlog: July 23, 2025: holy fuck i just needed a fucking background script for the service-worker that will listen to events from the 
-//          popup.js omygosh the button is werking now yiopeeee idk if its just my reading comprehension against the documentation if i missed it or the docs suck
-//          SOURCE: https://github.com/TUTORIEX/chrome-extension-101
 
 // TODO: iCalendar Processing (.ics)
 function exportToICS() {

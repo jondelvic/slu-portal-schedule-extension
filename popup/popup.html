@@ -16,7 +16,11 @@
             <div class="description">Click on your desired file format:</div>
             <div class="btn-container">
                 <button id="ics-btn">Export to iCalendar (.ics)</button>
-                <button id="csv-btn">Export to CSV (.csv)</button>
+                <button id="csv-btn">Export to CSV (.csv)
+                    <!-- Change warning message for easier understanding (SINGLE DAY USE ONLY (TODAY)) -->
+                    <div class="warning1">Recurring events not supported!</div> 
+                </button>
+                
                 <button id="json-btn">Export to JSON (.json)</button>
             </div>        
         </div>
