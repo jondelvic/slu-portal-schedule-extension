@@ -21,20 +21,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // AY 2024 - 2025 (this must be updated per AY)
-let firstSemEndDate = "12/16/2024" // first semester
-let secondSemEndDate = "05/22/2025" // second semester
-let shortTermEndDate = "07/22/2025" // short term
-
-// Get current date
-const currentDate = new Date().toLocaleDateString();
-
-// Get current day (0 - 6; Sunday - Saturday)
-const currentDayOfTheWeek = new Date().getDay();
+let firstSemEndDate = "12/18/2025" // first semester
+let secondSemEndDate = "05/23/2026" // second semester
+let shortTermEndDate = "07/22/2026" // short term
 
 // Read class schedule table from schedule tab of portal
 const table = document.querySelectorAll("table.mws-table");
 const thead = document.querySelectorAll("table.mws-table > thead > tr > th"); 
 const tbody = document.getElementsByTagName("tbody"); 
+
+const currentDate = new Date().toLocaleDateString(); // Get current date
+
+const currentDayOfTheWeek = new Date().getDay(); // Get current day (0 - 6; Sunday - Saturday)
+
+const validDays = ['M', 'T', 'W', 'TH', 'F', 'S']; // Days distinguisher at portal
 
 // Get class schedule table headers
 const tableHeaders = [];
@@ -49,8 +49,8 @@ console.log("Number of courses enrolled: " + courseCount);
 
 // Get course schedule data
 console.log("Schedule details of enrolled courses: ")
-
 const courseScheduleDetails = [];
+
 for (let i = 0; i < courseCount; i++) {
     let courseSchedule = tbodyRows.item(i).innerText.replaceAll(/\t/g,',');
     courseSchedule = courseSchedule.substring(0, courseSchedule.length - 1);
@@ -60,8 +60,9 @@ for (let i = 0; i < courseCount; i++) {
     courseScheduleDetails.push(courseSchedule);
 }
 
-// CSV Processing (.csv)
-// note: removed end date due to csv not supporting recurring events
+console.log(courseScheduleDetails);
+
+// CSV Processing
 function exportToCSV() {
     const csvHeaders = ["Subject", "Start Date", "Start Time", "End Time", "Description", "Location"];
 
@@ -72,7 +73,7 @@ function exportToCSV() {
         startDate = "0" + currentDate;
     }
 
-    // let endDate = shortTermEndDate;
+    // let endDate = shortTermEndDate; // note: removed end date due to csv not supporting recurring events
     let startTime = [];
     let endTime = [];
     let description = [];
@@ -81,19 +82,18 @@ function exportToCSV() {
 
     let csvContent = csvHeaders.join(",");
 
-    console.log("Today is a " + currentDayOfTheWeek);
     for (let i = 0; i < courseScheduleDetails.length; i++) {
         csvContent += "\n";
 
         let scheduleElements = courseScheduleDetails[i].split(",");
 
-        dayOfTheWeek.push(scheduleElements[5]);
+        dayOfTheWeek.push(scheduleElements[5]); // Days column on portal
         
         let days = dayOfTheWeek[i].split('').join(',');
-        console.log("Weekly Schedule: ");
+        // console.log("Weekly Schedule: ");
 
         days = days.split(',');
-        console.log(days);
+        // console.log(days);
 
         let weeklySchedule = [];
 
@@ -103,20 +103,45 @@ function exportToCSV() {
                 console.log("This is a tuesday? or a thursday?");
                 if (days[j + 1] == 'H') {
                     console.log("This is a thursday!");
-                    weeklySchedule.push(days[j] + days[j + 1]);
-                    console.log(weeklySchedule);
+                    weeklySchedule.push(4); // push the day of the week; 4 - thursday
                 } else {
                     console.log("This is a tuesday!");
+                    weeklySchedule.push(2); // push tuesdaqy; 2 - tuesday
                 }
             } 
         }
 
-        subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); 
+        // console.log(weeklySchedule);
+
+        subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); // <Course Number> (<Class Code>)
         csvContent += subject[i] + ",";
 
-        csvContent += startDate + ",";
+        csvContent += startDate + ","; // Date today 
 
-        let startTimeString = scheduleElements[4].substring(0, 2) + ":" + scheduleElements[4].substring(2, 4) + " " + scheduleElements[4].substring(12, 14); // this could have an issue with am/pm overlap
+        // VALID AM TIME: 07:30, 8:00, 8:30, 9:00, 9:30, 10:00, 10:30, 11:30 
+        // VALID PM TIME: 12:00, 12:30, 1:30, 2:00, 2:30, 3:00, 3:30, 4:00, 4:30, 5:00, 5:30, 6:00, 6:30, 7:00, 7:30, 8:00, 8:30
+        let startTimeString = scheduleElements[4].substring(0, 2) + ":" + scheduleElements[4].substring(2, 4) + " ";
+
+        // Bruteforce condition for am/pm overlap
+        // Algorithm:
+        //  - Check if the indicated time schedule is AM/PM
+        //      a. If PM, verify if there is an AM/PM overlap
+        //      b. If AM, it shouldn't have an AM/pm overlap
+        if (scheduleElements[4].substring(12, 14) == "PM") {
+            // console.log("This is either AM + PM schedule or purely PM");
+
+            if ((scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) < 1200 && (scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) > 830) {
+                // console.log(startTimeString + "is AM");
+                startTimeString += "AM";
+            } else {
+                // console.log(startTimeString + "is PM");
+                startTimeString += "PM";
+            }
+        } else {
+            // console.log("This is a pure AM schedule");
+            startTimeString += "AM";
+        }
+
         startTime.push(startTimeString);
         csvContent += startTime[i] + ",";
 
