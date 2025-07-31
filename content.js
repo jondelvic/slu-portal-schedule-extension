@@ -60,7 +60,7 @@ for (let i = 0; i < courseCount; i++) {
     courseScheduleDetails.push(courseSchedule);
 }
 
-console.log(courseScheduleDetails);
+// console.log(courseScheduleDetails);
 
 // CSV Processing
 function exportToCSV() {
@@ -88,30 +88,35 @@ function exportToCSV() {
         let scheduleElements = courseScheduleDetails[i].split(",");
 
         dayOfTheWeek.push(scheduleElements[5]); // Days column on portal
-        
-        let days = dayOfTheWeek[i].split('').join(',');
-        // console.log("Weekly Schedule: ");
 
-        days = days.split(',');
-        // console.log(days);
+        // tester onli:
+        dayOfTheWeek[0] = 'THTS'
+
+        let days = dayOfTheWeek[i];
+        console.log(days);
 
         let weeklySchedule = [];
+        if (days == "DAILY") { // If this is DAILY, export immediately since it doesn't matter anyway (CSV is only for single-day exporting)
+            weeklySchedule += validDays;
+            // console.log(weeklySchedule);
+        } else { // If schedule is not DAILY, extract the schedule string
+            weeklySchedule += days;
+            weeklySchedule = weeklySchedule.split('');
+            // console.log(weeklySchedule);
 
-        // checking for 'T' and 'TH' case
-        for (let j = 0; j < days.length; j++) {
-            if (days[j] == 'T') {
-                console.log("This is a tuesday? or a thursday?");
-                if (days[j + 1] == 'H') {
-                    console.log("This is a thursday!");
-                    weeklySchedule.push(4); // push the day of the week; 4 - thursday
-                } else {
-                    console.log("This is a tuesday!");
-                    weeklySchedule.push(2); // push tuesdaqy; 2 - tuesday
+            // ADDRESSES 'THFS' schedule but NOT 'TTHS' OOPSIE
+            for (let j = 0; j < weeklySchedule.length; j++) {
+                if (weeklySchedule[j] == 'T' && weeklySchedule[j + 1] == 'H') {
+                    // console.log(weeklySchedule[j] + weeklySchedule[j + 1]);
+                    weeklySchedule.push(weeklySchedule[j] + weeklySchedule[j + 1]);
+                    weeklySchedule.shift();
+                    weeklySchedule.shift();
+                    // console.log(weeklySchedule);
                 }
-            } 
+            }
         }
 
-        // console.log(weeklySchedule);
+        console.log(weeklySchedule);
 
         subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); // <Course Number> (<Class Code>)
         csvContent += subject[i] + ",";
