@@ -1,7 +1,3 @@
-/* TODO: Check the schedule under the DAYS header from the portal if it is for this day. 
-If not, don't process for csv and only append the one that's scheduled 
-(e.g., THFS (Thursday, Friday, Saturday), DAILY (Monday to Saturday),  TTHS (Tuesday, Thursday, Saturday)) */
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log(request);
 
@@ -62,6 +58,9 @@ for (let i = 0; i < courseCount; i++) {
 
 // console.log(courseScheduleDetails);
 
+/* TODO: Check the schedule under the DAYS header from the portal if it is for this day. 
+If not, don't process for csv and only append the one that's scheduled 
+(e.g., THFS (Thursday, Friday, Saturday), DAILY (Monday to Saturday),  TTHS (Tuesday, Thursday, Saturday)) */
 // CSV Processing
 function exportToCSV() {
     const csvHeaders = ["Subject", "Start Date", "Start Time", "End Time", "Description", "Location"];
@@ -90,28 +89,30 @@ function exportToCSV() {
         dayOfTheWeek.push(scheduleElements[5]); // Days column on portal
 
         // tester onli:
-        dayOfTheWeek[0] = 'THTS'
+        // dayOfTheWeek[0] = 'TTHS';
+        // dayOfTheWeek[1] = 'THFS';
+        // dayOfTheWeek[2] = 'MWTH';
+        // dayOfTheWeek[0] = 'MWTHFS';
+        // dayOfTheWeek[0] = 'MTWTHF';
 
         let days = dayOfTheWeek[i];
-        console.log(days);
+        // console.log(days);
 
         let weeklySchedule = [];
         if (days == "DAILY") { // If this is DAILY, export immediately since it doesn't matter anyway (CSV is only for single-day exporting)
-            weeklySchedule += validDays;
-            // console.log(weeklySchedule);
-        } else { // If schedule is not DAILY, extract the schedule string
+            weeklySchedule = validDays;
+        } else { // If schedule is not DAILY, extract the schedule string and export only if the weekly schedule of that subject is today/tomorrow?
             weeklySchedule += days;
             weeklySchedule = weeklySchedule.split('');
-            // console.log(weeklySchedule);
 
-            // ADDRESSES 'THFS' schedule but NOT 'TTHS' OOPSIE
             for (let j = 0; j < weeklySchedule.length; j++) {
                 if (weeklySchedule[j] == 'T' && weeklySchedule[j + 1] == 'H') {
-                    // console.log(weeklySchedule[j] + weeklySchedule[j + 1]);
                     weeklySchedule.push(weeklySchedule[j] + weeklySchedule[j + 1]);
-                    weeklySchedule.shift();
-                    weeklySchedule.shift();
-                    // console.log(weeklySchedule);
+                    
+                    if (weeklySchedule.includes('TH')) { 
+                        weeklySchedule.splice(weeklySchedule.indexOf('T'), 1);
+                        weeklySchedule.splice(weeklySchedule.indexOf('H'), 1);
+                    } 
                 }
             }
         }
