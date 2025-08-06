@@ -29,9 +29,12 @@ const tbody = document.getElementsByTagName("tbody");
 const user = document.querySelector("#mws-username"); // User's name for file name downloading
 console.log("Hello, " + user.innerText + "!");
 
-const currentDate = new Date().toLocaleDateString(); 
+const currentDate = new Date().toLocaleDateString('en-US'); // Format for google calendar (MM/DD/YYYY)
+// console.log("Today is " + currentDate);
 
-const currentDayOfTheWeek = new Date().getDay(); // (0 - 6; Sunday - Saturday)
+let currentDayOfTheWeek = new Date().getDay(); // (0 - 6; Sunday - Saturday)
+currentDayOfTheWeek = 2;
+console.log("Today is a " + currentDayOfTheWeek);
 
 const validDays = ['M', 'T', 'W', 'TH', 'F', 'S']; // Days distinguisher at portal; not really needed
 
@@ -51,11 +54,13 @@ console.log("Schedule details of enrolled courses: ")
 const courseScheduleDetails = [];
 
 for (let i = 0; i < courseCount; i++) {
-    let courseSchedule = tbodyRows.item(i).innerText.replaceAll(/\t/g,',');
+    let courseSchedule = tbodyRows.item(i).innerText.replaceAll(/\t/g,'|');
+    console.log(courseSchedule);
+
     courseSchedule = courseSchedule.substring(0, courseSchedule.length - 1);
     courseScheduleDetails.push(courseSchedule);
 
-    console.log(courseSchedule);
+    // console.log(courseSchedule);
 }
 
 // CSV Processing
@@ -65,24 +70,23 @@ function exportToCSV() {
     let subject = [];
     let startDate = currentDate;
 
-    if (startDate < 10) {
+    if (startDate < 10) { // TODO: Check if this is needed since there is already a fixed format for the date
         startDate = "0" + currentDate;
     }
 
     // let endDate = shortTermEndDate; // Removed end date due to CSV not supporting recurring events
-    let startTime = [];
-    let endTime = [];
-    let description = [];
-    let room = [];
+    // let startTime = [];
+    // let endTime = [];
+    // let description = [];
+    // let room = [];
     let dayOfTheWeek = [];
 
     let csvContent = csvHeaders.join(",");
 
     for (let i = 0; i < courseScheduleDetails.length; i++) {
-        let isScheduledToday = false; // Boolean value if this subject is scheduled today
-        csvContent += "\n";
+        // let isScheduledToday = false; // Boolean value if this subject is scheduled today
 
-        let scheduleElements = courseScheduleDetails[i].split(",");
+        let scheduleElements = courseScheduleDetails[i].replaceAll(',', '.').split("|");
 
         dayOfTheWeek.push(scheduleElements[5]); // Days column on portal
 
@@ -133,47 +137,56 @@ function exportToCSV() {
                         break;
                 } 
             }
-
-            console.log("Today is a " + currentDayOfTheWeek);
         }
 
-        console.log(weeklySchedule);
+        // console.log(weeklySchedule);
         console.log(weeklyScheduleIndex);
 
-        subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); // <Course Number> (<Class Code>)
-        csvContent += subject[i] + ",";
+        // console.log(weeklyScheduleIndex.includes(currentDayOfTheWeek));
 
-        csvContent += startDate + ","; // Date today 
-
-        let startTimeString = scheduleElements[4].substring(0, 2) + ":" + scheduleElements[4].substring(2, 4) + " ";
-
-        if (scheduleElements[4].substring(12, 14) == "PM") {
-            // console.log("This is either AM + PM schedule or purely PM");
-            if ((scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) < 1200 && 
-            (scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) > 830) {
-                // console.log(startTimeString + "is AM");
-                startTimeString += "AM";
-            } else {
-                // console.log(startTimeString + "is PM");
-                startTimeString += "PM";
-            }
+        if (!weeklyScheduleIndex.includes(currentDayOfTheWeek)) {
+            
         } else {
-            // console.log("This is a pure AM schedule");
-            startTimeString += "AM";
+            csvContent += "\n";
+            csvContent += scheduleElements[1] + " (" + scheduleElements[0] + ")" + ","; // <Course Number> (<Class Code>)
+
+            // console.log(scheduleElements[1] + " (" + scheduleElements[0] + ")");
+            //subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); // <Course Number> (<Class Code>)
+            // csvContent += subject[i] + ",";
+
+            csvContent += startDate + ","; // Date today 
+
+            let startTimeString = scheduleElements[4].substring(0, 2) + ":" + scheduleElements[4].substring(2, 4) + " ";
+
+            if (scheduleElements[4].substring(12, 14) == "PM") {
+                // console.log("This is either AM + PM schedule or purely PM");
+                if ((scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) < 1200 && 
+                (scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) > 830) {
+                    // console.log(startTimeString + "is AM");
+                    startTimeString += "AM";
+                } else {
+                    // console.log(startTimeString + "is PM");
+                    startTimeString += "PM";
+                }
+            } else {
+                // console.log("This is a pure AM schedule");
+                startTimeString += "AM";
+            }
+
+            // startTime.push(startTimeString);
+            // csvContent += startTime[i] + ",";
+            csvContent += startTimeString + ",";
+
+            let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 14);
+            // endTime.push(endTimeString);
+            csvContent += endTimeString + ",";
+
+            // description.push(scheduleElements[2]);
+            csvContent += scheduleElements[2] + ",";
+
+            // room.push(scheduleElements[6]);
+            csvContent += scheduleElements[6];
         }
-
-        startTime.push(startTimeString);
-        csvContent += startTime[i] + ",";
-
-        let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 14);
-        endTime.push(endTimeString);
-        csvContent += endTime[i] + ","
-
-        description.push(scheduleElements[2]);
-        csvContent += description[i] + ",";
-
-        room.push(scheduleElements[6]);
-        csvContent += room[i];
     }
 
     console.log(csvContent);
@@ -185,7 +198,7 @@ function exportToCSV() {
         const a = document.createElement('a');
 
         a.href = csvURL;
-        a.download = user.innerText + '_slu-portal-schedule.csv';
+        a.download = 'your-schedule-today.csv';
 
         a.click();
     }

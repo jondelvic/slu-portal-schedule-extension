@@ -76,10 +76,11 @@ button:hover {
 }
 
 .warning1 {
-    font-weight: 200;
+    font-weight: 300;
     color: white;
     font-size: 9px;
     font-style: italic;
+    padding-top: 1px;
 }
 
 footer {

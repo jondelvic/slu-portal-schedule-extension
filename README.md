@@ -1,1 +1,1 @@
-# slu-portal-schedule-converter
+# slu-portal-schedule-extension
