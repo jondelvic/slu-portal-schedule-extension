@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // AY 2025 - 2026 (UPDATE THIS EVERY YEAR)
-let firstSemEndDate = "12/18/2025" 
+let firstSemEndDate = "12/18/2025" // 20251218 FREQ=WEEKLY;BYDAY=<WEEKDAYS IN 2CHAR FORMAT>;UNTIL=20251218T000000Z
 let secondSemEndDate = "05/23/2026" 
 let shortTermEndDate = "07/22/2026"
 
@@ -50,6 +50,7 @@ const courseCount = tbodyRows.length - 1;
 console.log("Number of courses enrolled: " + courseCount);
 
 // Course Schedule Information
+// TODO: Address schedules for irregular students wherein a course/subject would have more than one row; see issue #8 for sample
 console.log("Schedule details of enrolled courses: ")
 const courseScheduleDetails = [];
 
@@ -173,6 +174,35 @@ function exportToCSV() {
 }
 
 // TODO: iCalendar Processing (.ics)
+/* 
+
+BEGIN:VCALENDAR
+VERSION: 2.0
+PRODID:
+
+BEGIN:VEVENT
+UID:
+DTSTAMP:
+DTSTART:
+DTEND:
+// (https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html) (https://icalendar.org/iCalendar-RFC-5545/3-3-10-recurrence-rule.html)
+RRULE:FREQ=WEEKLY;WKST=SU;
+SUMMARY:
+DESCRIPTION:
+LOCATION:
+
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER: 15 MINUTES BEFORE TIME
+DESCRIPTION:This is an event reminder
+END:VALARM
+
+END:VEVENT
+
+END:VCALENDAR
+
+
+*/
 function exportToICS() {
 
 }
