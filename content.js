@@ -26,17 +26,18 @@ const table = document.querySelectorAll("table.mws-table");
 const thead = document.querySelectorAll("table.mws-table > thead > tr > th"); 
 const tbody = document.getElementsByTagName("tbody"); 
 
-const user = document.querySelector("#mws-username"); // User's name for file name downloading
-console.log("Hello, " + user.innerText + "!");
+const user = document.querySelector("#mws-username").innerText; 
+let nameSplitter = user.split(' ');
+console.log("Hello, " + user + "!");
 
 const currentDate = new Date().toLocaleDateString('en-US'); // Format for google calendar (MM/DD/YYYY)
-// console.log("Today is " + currentDate);
+console.log("Date today: " + currentDate);
 
 let currentDayOfTheWeek = new Date().getDay(); // (0 - 6; Sunday - Saturday)
-currentDayOfTheWeek = 2;
-console.log("Today is a " + currentDayOfTheWeek);
+// currentDayOfTheWeek = 1;
+console.log("Day of the week: " + currentDayOfTheWeek);
 
-const validDays = ['M', 'T', 'W', 'TH', 'F', 'S']; // Days distinguisher at portal; not really needed
+const validDays = ['M', 'T', 'W', 'TH', 'F', 'S']; // Days distinguisher at portal
 
 // Class Schedule Table Headers
 const tableHeaders = [];
@@ -44,7 +45,6 @@ for (let i = 0; i < thead.length; i++) {
     tableHeaders.push(thead.item(i).innerText);
 }
 
-// Number of Courses Enrolled
 const tbodyRows = tbody[0].rows;
 const courseCount = tbodyRows.length - 1;
 console.log("Number of courses enrolled: " + courseCount);
@@ -59,15 +59,12 @@ for (let i = 0; i < courseCount; i++) {
 
     courseSchedule = courseSchedule.substring(0, courseSchedule.length - 1);
     courseScheduleDetails.push(courseSchedule);
-
-    // console.log(courseSchedule);
 }
 
 // CSV Processing
 function exportToCSV() {
     const csvHeaders = ["Subject", "Start Date", "Start Time", "End Time", "Description", "Location"];
 
-    let subject = [];
     let startDate = currentDate;
 
     if (startDate < 10) { // TODO: Check if this is needed since there is already a fixed format for the date
@@ -75,35 +72,22 @@ function exportToCSV() {
     }
 
     // let endDate = shortTermEndDate; // Removed end date due to CSV not supporting recurring events
-    // let startTime = [];
-    // let endTime = [];
-    // let description = [];
-    // let room = [];
     let dayOfTheWeek = [];
 
     let csvContent = csvHeaders.join(",");
 
     for (let i = 0; i < courseScheduleDetails.length; i++) {
-        // let isScheduledToday = false; // Boolean value if this subject is scheduled today
-
         let scheduleElements = courseScheduleDetails[i].replaceAll(',', '.').split("|");
 
         dayOfTheWeek.push(scheduleElements[5]); // Days column on portal
-
-        // TESTER FOR WEEKLY SCHEDULE
-        // dayOfTheWeek[0] = 'TTHS';
-        // dayOfTheWeek[0] = 'THFS';
-        // dayOfTheWeek[0] = 'MWTH';
-        // dayOfTheWeek[0] = 'MWTHFS';
-        // dayOfTheWeek[0] = 'MTWTHF';
 
         let days = dayOfTheWeek[i];
 
         let weeklySchedule = [];
         let weeklyScheduleIndex = [];
-        if (days == "DAILY") { // If schedule is daily, include in CSV file if file is exported during monday to saturday
+        if (days == "DAILY") { // If schedule is daily, include in CSV file 
             weeklySchedule = validDays;
-            weeklyScheduleIndex = [1, 2, 3, 4, 5, 6]; // 1-6 (Monday to Saturday)
+            weeklyScheduleIndex = [1, 2, 3, 4, 5, 6]; // Monday to Saturday
         } else { // If schedule is not DAILY, extract the schedule string and export only if the weekly schedule of that subject is today
             weeklySchedule += days;
             weeklySchedule = weeklySchedule.split('');
@@ -139,53 +123,34 @@ function exportToCSV() {
             }
         }
 
-        // console.log(weeklySchedule);
-        console.log(weeklyScheduleIndex);
-
-        // console.log(weeklyScheduleIndex.includes(currentDayOfTheWeek));
-
         if (!weeklyScheduleIndex.includes(currentDayOfTheWeek)) {
             
         } else {
             csvContent += "\n";
             csvContent += scheduleElements[1] + " (" + scheduleElements[0] + ")" + ","; // <Course Number> (<Class Code>)
 
-            // console.log(scheduleElements[1] + " (" + scheduleElements[0] + ")");
-            //subject.push(scheduleElements[1] + " (" + scheduleElements[0] + ")"); // <Course Number> (<Class Code>)
-            // csvContent += subject[i] + ",";
-
             csvContent += startDate + ","; // Date today 
 
             let startTimeString = scheduleElements[4].substring(0, 2) + ":" + scheduleElements[4].substring(2, 4) + " ";
 
-            if (scheduleElements[4].substring(12, 14) == "PM") {
-                // console.log("This is either AM + PM schedule or purely PM");
-                if ((scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) < 1200 && 
-                (scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) > 830) {
-                    // console.log(startTimeString + "is AM");
+            if (scheduleElements[4].substring(12, 14) == "PM") { // Either PM only or overlapping AM/PM
+                if ((scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) < 1200 && (scheduleElements[4].substring(0, 2) + scheduleElements[4].substring(2,4)) > 830) { // AM
                     startTimeString += "AM";
-                } else {
-                    // console.log(startTimeString + "is PM");
+                } else { // PM
                     startTimeString += "PM";
                 }
-            } else {
-                // console.log("This is a pure AM schedule");
+            } else { // AM only
                 startTimeString += "AM";
             }
 
-            // startTime.push(startTimeString);
-            // csvContent += startTime[i] + ",";
             csvContent += startTimeString + ",";
 
             let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 14);
-            // endTime.push(endTimeString);
             csvContent += endTimeString + ",";
 
-            // description.push(scheduleElements[2]);
-            csvContent += scheduleElements[2] + ",";
+            csvContent += scheduleElements[2] + ","; // Description
 
-            // room.push(scheduleElements[6]);
-            csvContent += scheduleElements[6];
+            csvContent += scheduleElements[6]; // Room
         }
     }
 
@@ -198,13 +163,12 @@ function exportToCSV() {
         const a = document.createElement('a');
 
         a.href = csvURL;
-        a.download = 'your-schedule-today.csv';
+        a.download = nameSplitter.at(nameSplitter.length - 1) + '-sched-today.csv';
 
         a.click();
     }
 
     download(csvContent); 
-
     return csvContent;
 }
 
