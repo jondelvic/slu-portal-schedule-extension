@@ -34,7 +34,7 @@ const currentDate = new Date().toLocaleDateString('en-US'); // Format for google
 console.log("Date today: " + currentDate);
 
 let currentDayOfTheWeek = new Date().getDay(); // (0 - 6; Sunday - Saturday)
-// currentDayOfTheWeek = 1;
+currentDayOfTheWeek = 6;
 console.log("Day of the week: " + currentDayOfTheWeek);
 
 const validDays = ['M', 'T', 'W', 'TH', 'F', 'S']; // Days distinguisher at portal
@@ -55,10 +55,15 @@ console.log("Schedule details of enrolled courses: ")
 const courseScheduleDetails = [];
 
 for (let i = 0; i < courseCount; i++) {
+    // TODO: Add checker if next table row (tr) has an 4 consecutive empty td elements.
+    // console.log(tbodyRows.item(i).substring(0, 3) === ""); // this doesnt work lol
+    console.log(tbodyRows.item(i));
+
     let courseSchedule = tbodyRows.item(i).innerText.replaceAll(/\t/g,'|');
     console.log(courseSchedule);
 
     courseSchedule = courseSchedule.substring(0, courseSchedule.length - 1);
+
     courseScheduleDetails.push(courseSchedule);
 }
 
@@ -153,6 +158,8 @@ function exportToCSV() {
 
             csvContent += scheduleElements[6]; // Room
         }
+
+        // console.log(csvContent);
     }
 
     console.log(csvContent);
