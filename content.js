@@ -34,7 +34,7 @@ const currentDate = new Date().toLocaleDateString('en-US'); // Format for google
 console.log("Date today: " + currentDate);
 
 let currentDayOfTheWeek = new Date().getDay(); // (0 - 6; Sunday - Saturday)
-currentDayOfTheWeek = 6;
+currentDayOfTheWeek = 1;
 console.log("Day of the week: " + currentDayOfTheWeek);
 
 const validDays = ['M', 'T', 'W', 'TH', 'F', 'S']; // Days distinguisher at portal
@@ -53,11 +53,12 @@ console.log("Number of courses enrolled: " + courseCount);
 // TODO: Address schedules for irregular students wherein a course/subject would have more than one row; see issue #8 for sample
 console.log("Schedule details of enrolled courses: ")
 const courseScheduleDetails = [];
+// let courseScheduleDetailsElement = []; // for checker if item 0 - 3 is an empty string or null?
 
 for (let i = 0; i < courseCount; i++) {
     // TODO: Add checker if next table row (tr) has an 4 consecutive empty td elements.
     // console.log(tbodyRows.item(i).substring(0, 3) === ""); // this doesnt work lol
-    console.log(tbodyRows.item(i));
+    // console.log(tbodyRows.item(i).innerText.replaceAll(/\t/g,''));
 
     let courseSchedule = tbodyRows.item(i).innerText.replaceAll(/\t/g,'|');
     console.log(courseSchedule);
@@ -65,6 +66,46 @@ for (let i = 0; i < courseCount; i++) {
     courseSchedule = courseSchedule.substring(0, courseSchedule.length - 1);
 
     courseScheduleDetails.push(courseSchedule);
+}
+
+irregularChecker();
+
+function irregularChecker() {
+    let temp = [[]];
+
+    for (let i = 0; courseScheduleDetails.length; i++) {
+
+        let scheduleElements = courseScheduleDetails[i].replaceAll(',', '.').split("|");    
+
+        console.log(scheduleElements);
+
+        if (scheduleElements[0] === '') {
+            console.log('encountered a row for the previous course row!');
+
+            console.log("below is the before row course");
+            console.log(courseScheduleDetails[i - 1].split('|'));
+
+            // console.log(temp);
+            console.log("\n");
+
+            let prevScheduleElement = courseScheduleDetails[i - 1].replaceAll(',','.').split('|');
+            console.log(prevScheduleElement[4]);
+            console.log(scheduleElements[4]);
+
+            // console.log(prevScheduleElement[4] == scheduleElements[4]);
+            if (prevScheduleElement[4] == scheduleElements[4]) {
+                // check the days if a day must be appended to previous row (e.g., TH (prev) M (curr), it becomes MTH or THM bahala na)
+                // maybe also add a checker if same room or iba kapag may ganung case
+            }
+        }
+
+        // console.log(temp[0]);
+        // console.log(temp[1]);
+        // console.log(scheduleElements[4]);
+        // if (temp[4] === scheduleElements[4]) {
+        //     console.log("same!");
+        // }
+    }
 }
 
 // CSV Processing
