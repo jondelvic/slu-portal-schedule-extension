@@ -55,7 +55,7 @@ const courseScheduleDetails = [];
 for (let i = 0; i < courseCount; i++) {
     let courseSchedule = tbodyRows.item(i).innerText.replaceAll(/\t/g,'|');
     console.log(courseSchedule);
-    courseSchedule = courseSchedule.substring(0, courseSchedule.length - 1);
+    courseSchedule = courseSchedule.substring(0, courseSchedule.length);
     courseScheduleDetails.push(courseSchedule);
 }
 
@@ -160,7 +160,7 @@ function exportToCSV() {
 
             csvContent += startTimeString + ",";
 
-            let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 14);
+            let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 15);
             csvContent += endTimeString + ",";
 
             csvContent += scheduleElements[2] + ","; // Description
@@ -188,12 +188,65 @@ function exportToCSV() {
     return csvContent;
 }
 
+let uuid = self.crypto.randomUUID();
+console.log(uuid);
+
+// const array = new Uint32Array(10);
+// self.crypto.getRandomValues(array);
+
+// console.log("Your lucky numbers:");
+// for (const num of array) {
+//   console.log(num);
+// }
+
+/* 
+BEGIN:VEVENT
+DTSTAMP:<currentDate>T<currentTime>Z
+UID:<DTSTAMP>-<randomUUID>@slu-portal-schedule-extension.com/ical
+DTSTART;TZID=Asia/Manila:20260811T190000
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH,SA;UNTIL=20261217T110000Z
+DTEND;TZID=Asia/Manila:20260811T200000
+SUMMARY:CS 411
+DESCRIPTION:CS THESIS 1
+LOCATION:ONLINE
+END:VEVENT 
+
+*/
+
 // TODO: iCalendar Processing (.ics)
 /* 
 
 BEGIN:VCALENDAR
 VERSION: 2.0
-PRODID:
+PRODID:-//https://github.com/jondelvic/slu-portal-schedule-extension//ical
+CALSCALE:GREGORIAN
+X-WR-TIMEZONE:Asia/Manila
+BEGIN:VTIMEZONE
+TZID:Asia/Manila
+X-LIC-LOCATION:Asia/Manila
+BEGIN:STANDARD
+TZNAME:GMT+8
+TZOFFSETFROM:+0800
+TZOFFSETTO:+0800
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTAMP:20260811T150547Z
+UID:20260811T150547Z-5245f631-17be-40db-ac28-59ae8d49b861@slu-portal-schedule-extension.com/ical
+DTSTART;TZID=Asia/Manila:20260811T190000
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH,SA;UNTIL=20261217T110000Z
+DTEND;TZID=Asia/Manila:20260811T200000
+SUMMARY:CS 411
+DESCRIPTION:CS THESIS 1
+LOCATION:ONLINE
+END:VEVENT
+END:VCALENDAR
+
+
+*/
+
+/*
 
 BEGIN:VEVENT
 UID:
@@ -212,11 +265,7 @@ TRIGGER: 15 MINUTES BEFORE TIME
 DESCRIPTION:This is an event reminder
 END:VALARM
 
-END:VEVENT
-
-END:VCALENDAR
-
-
+END:VEVENT  
 */
 function exportToICS() {
 
