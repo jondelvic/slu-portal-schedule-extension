@@ -3,7 +3,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
     switch (request.message) {
         case "ics":
-            alert("Exporting to iCalendar is not yet available. \nCurrently working on it!");
+            exportToICS();
+            //alert("Exporting to iCalendar is not yet available. \nCurrently working on it!");
             break;
         case "csv":
             exportToCSV();
@@ -267,8 +268,50 @@ END:VALARM
 
 END:VEVENT  
 */
-function exportToICS() {
 
+// main ref: https://github.com/nwcell/ics.js/blob/master/ics.js
+// https://youtu.be/_HZdLuGL8Ho?si=3IlfmYEpMBbxW8hr
+function exportToICS() {
+    const prodId = "-//https://github.com/jondelvic/slu-portal-schedule-extension//ical"
+
+    const calendarStart = ["BEGIN:VCALENDAR", 
+        "VERSION:1.0", 
+        "PRODID:" + prodId, 
+        "CALSCALE:GREGORIAN", 
+        "X-WR-TIMEZONE:Asia/Manila",
+        "BEGIN:VTIMEZONE",
+        "TZID:Asia/Manila",
+        "X-LIC-LOCATION:Asia/Manila",
+        "BEGIN:STANDARD",
+        "TZNAME:GMT+8",
+        "TZOFFSETFROM:+0800",
+        "TZOFFSETTO:+0800",
+        "DTSTART:19700101T000000",
+        "END:STANDARD",
+        "END:VTIMEZONE"].join('\n')
+
+    console.log(calendarStart)
+
+    //console.log("Here are your courses: \n" + courseScheduleDetails)
+
+    // this can be placed at global level (repetitive)
+    for (let i = 0; i < courseScheduleDetails.length; i++) {
+        let scheduleElements = courseScheduleDetails[i].replaceAll(',', '.').split("|");
+
+        console.log(scheduleElements)
+
+        // TODO: for each schedule element printed array group, process the VEVENT for each.
+    }
+
+    // this can be a separate function that can be used in all export buttons? since repetitive
+    const icsBlob = new Blob([calendarStart], { type: 'text/calendar'});
+    const icsURL = URL.createObjectURL(icsBlob);
+
+    const a = document.createElement('a');
+
+    a.href = icsURL;
+    a.download = nameSplitter.at(nameSplitter.length - 1) + '-sched.ics';
+    a.click()
 }
 
 // TODO: JSON Processing (.json)
