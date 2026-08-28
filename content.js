@@ -304,25 +304,47 @@ function exportToICS() {
     let classSchedule = calendarStart
 
     //console.log("Here are your courses: \n" + courseScheduleDetails)
-    let event = [
+    let startEvent = [
         "\nBEGIN:VEVENT",
         "DTSTAMP:" + icsDate,
         "UID:" + uuid,
         "DTSTART;TZID=Asia/Manila:" // date today + scheduleElements[4 ]
     ].join('\n')
 
+    classSchedule = classSchedule + startEvent
+    //console.log(classSchedule)
+
     // this can be placed at global level (repetitive)
     for (let i = 0; i < courseScheduleDetails.length; i++) {
         let scheduleElements = courseScheduleDetails[i].replaceAll(',', '.').split("|");
 
-        console.log(scheduleElements)
+        // LOGIC stolen from export to csv ( can be exported to a diff function for repeptitievesness)
+        let startTimeString = scheduleElements[4].substring(0, 4)
+        //console.log(startTimeString)
 
-        // TODO: for each schedule element printed array group, process the VEVENT for each.
+        let startTime = Number(startTimeString)
 
+        if (scheduleElements[4].substring(12, 14) == "PM") { // Either PM only or overlapping AM/PM
+            if (startTime < 1200 && startTime > 830) { // AM
+                //startTimeString += "AM";
+                //classSchedule += startTimeString
+            } else { // PM
+                //startTimeString += "PM";
+                startTime += 1200
+                //console.log(startTime) // this is if afternoon for 24-hour formatting in dtstart
+
+                startTimeString = startTime.toString()
+            }
+        } else { // AM only
+            //startTimeString += "AM";
+        }
+
+        console.log(startTimeString)
+
+        let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 15);
     }
 
-    classSchedule = classSchedule + event
-    console.log(classSchedule)
+
 
     // this can be a separate function that can be used in all export buttons? since repetitive
     const icsBlob = new Blob([classSchedule], { type: 'text/calendar'});
