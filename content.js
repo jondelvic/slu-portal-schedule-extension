@@ -31,6 +31,7 @@ const user = document.querySelector("#mws-username").innerText;
 let nameSplitter = user.split(' ');
 console.log("Hello, " + user + "!");
 
+// note: used for csv i think
 const currentDate = new Date().toLocaleDateString('en-US'); // Format for google calendar (MM/DD/YYYY)
 console.log("Date today: " + currentDate);
 
@@ -269,9 +270,18 @@ END:VALARM
 END:VEVENT  
 */
 
+
+// DTSTAMP
+let icsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString() // source: https://stackoverflow.com/a/76621138
+icsDate = icsDate.replace(/-/g, '')
+icsDate = icsDate.replace(/:/g, '')
+icsDate = icsDate.replace(/\.\d+/, '')
+console.log(icsDate)
+
 // main ref: https://github.com/nwcell/ics.js/blob/master/ics.js
 // https://youtu.be/_HZdLuGL8Ho?si=3IlfmYEpMBbxW8hr
 function exportToICS() {
+
     const prodId = "-//https://github.com/jondelvic/slu-portal-schedule-extension//ical"
 
     const calendarStart = ["BEGIN:VCALENDAR", 
@@ -291,8 +301,15 @@ function exportToICS() {
         "END:VTIMEZONE"].join('\n')
 
     console.log(calendarStart)
+    let classSchedule = calendarStart
 
     //console.log("Here are your courses: \n" + courseScheduleDetails)
+    let event = [
+        "\nBEGIN:VEVENT",
+        "DTSTAMP:" + icsDate,
+        "UID:" + uuid,
+        "DTSTART;TZID=Asia/Manila:" // date today + scheduleElements[4 ]
+    ].join('\n')
 
     // this can be placed at global level (repetitive)
     for (let i = 0; i < courseScheduleDetails.length; i++) {
@@ -301,10 +318,14 @@ function exportToICS() {
         console.log(scheduleElements)
 
         // TODO: for each schedule element printed array group, process the VEVENT for each.
+
     }
 
+    classSchedule = classSchedule + event
+    console.log(classSchedule)
+
     // this can be a separate function that can be used in all export buttons? since repetitive
-    const icsBlob = new Blob([calendarStart], { type: 'text/calendar'});
+    const icsBlob = new Blob([classSchedule], { type: 'text/calendar'});
     const icsURL = URL.createObjectURL(icsBlob);
 
     const a = document.createElement('a');
