@@ -18,9 +18,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // AY 2025 - 2026 (UPDATE THIS EVERY YEAR)
-let firstSemEndDate = "12/18/2025" // 20251218 FREQ=WEEKLY;BYDAY=<WEEKDAYS IN 2CHAR FORMAT>;UNTIL=20251218T000000Z
-let secondSemEndDate = "05/23/2026" 
-let shortTermEndDate = "07/22/2026"
+// updated for 2026-2027
+let firstSemEndDate = "12/17/2026" // 20251218 FREQ=WEEKLY;BYDAY=<WEEKDAYS IN 2CHAR FORMAT>;UNTIL=20251218T000000Z
+let secondSemEndDate = "05/22/2027" 
+let shortTermEndDate = "07/20/2026"
 
 // Read class schedule tables from schedule tab of portal
 const table = document.querySelectorAll("table.mws-table");
@@ -76,7 +77,7 @@ function irregularChecker(courseScheduleDetailsArr) {
     // TODO: Retrieve the day of the week for the irregular schedule row and append it to the row above it
 }
 
-irregularChecker(courseScheduleDetails);
+//irregularChecker(courseScheduleDetails);
 
 // CSV Processing
 function exportToCSV() {
@@ -189,9 +190,7 @@ function exportToCSV() {
     download(csvContent); 
     return csvContent;
 }
-
-let uuid = self.crypto.randomUUID();
-console.log(uuid);
+// console.log(uuid);
 
 // const array = new Uint32Array(10);
 // self.crypto.getRandomValues(array);
@@ -272,7 +271,7 @@ END:VEVENT
 
 
 // DTSTAMP
-let icsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString() // source: https://stackoverflow.com/a/76621138
+let icsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000 + 86400000).toISOString() // source: https://stackoverflow.com/a/76621138
 icsDate = icsDate.replace(/-/g, '')
 icsDate = icsDate.replace(/:/g, '')
 icsDate = icsDate.replace(/\.\d+/, '')
@@ -300,51 +299,162 @@ function exportToICS() {
         "END:STANDARD",
         "END:VTIMEZONE"].join('\n')
 
-    console.log(calendarStart)
     let classSchedule = calendarStart
-
-    //console.log("Here are your courses: \n" + courseScheduleDetails)
-    let startEvent = [
-        "\nBEGIN:VEVENT",
-        "DTSTAMP:" + icsDate,
-        "UID:" + uuid,
-        "DTSTART;TZID=Asia/Manila:" // date today + scheduleElements[4 ]
-    ].join('\n')
-
-    classSchedule = classSchedule + startEvent
-    //console.log(classSchedule)
 
     // this can be placed at global level (repetitive)
     for (let i = 0; i < courseScheduleDetails.length; i++) {
         let scheduleElements = courseScheduleDetails[i].replaceAll(',', '.').split("|");
+        console.log(scheduleElements)
+
+        let uuid = self.crypto.randomUUID();
+
+        //console.log("Here are your courses: \n" + courseScheduleDetails)
+        let startEvent = [
+            "\nBEGIN:VEVENT",
+            "DTSTAMP:" + icsDate,
+            "UID:" + uuid,
+            "DTSTART;TZID=Asia/Manila:" // date today + scheduleElements[4 ]
+        ].join('\n')
+
+        classSchedule += startEvent
+        //console.log(classSchedule)
+
+        dtStart = icsDate.substring(0,8)
+        //console.log(dtStart)
+
+        let startTimeString = ""
+        let days = []
 
         // LOGIC stolen from export to csv ( can be exported to a diff function for repeptitievesness)
-        let startTimeString = scheduleElements[4].substring(0, 4)
+        startTimeString = scheduleElements[4].substring(0, 4)
         //console.log(startTimeString)
 
         let startTime = Number(startTimeString)
 
         if (scheduleElements[4].substring(12, 14) == "PM") { // Either PM only or overlapping AM/PM
-            if (startTime < 1200 && startTime > 830) { // AM
-                //startTimeString += "AM";
-                //classSchedule += startTimeString
-            } else { // PM
-                //startTimeString += "PM";
+            if (startTime < 1200 && startTime > 830) {  // am pm is not really the case here, its the 24-hour format
+                // am. do nothing
+            } else if (startTime >= 1200 && startTime <= 1259) {
+                // do nothing
+            } else { // pm
                 startTime += 1200
-                //console.log(startTime) // this is if afternoon for 24-hour formatting in dtstart
-
-                startTimeString = startTime.toString()
             }
-        } else { // AM only
-            //startTimeString += "AM";
         }
 
-        console.log(startTimeString)
+        startTimeString = startTime.toString()
 
-        let endTimeString = scheduleElements[4].substring(7, 9) + ":" + scheduleElements[4].substring(9, 11) + " " + scheduleElements[4].substring(12, 15);
+        console.log(startTimeString)
+        dtStart += 'T' + startTimeString + "00"
+        console.log(dtStart)
+        classSchedule += dtStart
+
+        dtStart = icsDate.substring(0,8) // reset dtstart per loop iteration; 
+
+        classSchedule += "\nRRULE:FREQ=WEEKLY;BYDAY=" // insert days here
+
+        // TODO: EXDATE; We're currently having issues with the datestart since even if it's not part of by day, the schedules get imported. i think google calendar fixed this using EXDATE?
+        days.push(scheduleElements[5])
+
+        console.log(days)
+
+        let weeklySchedule = [];
+        let byDay = [];
+
+        if (days == "DAILY") { // If schedule is daily, 
+            byDay = ["MO", "TU", "WE", "TH", "FR", "SA"];
+        } else { 
+            weeklySchedule += days;
+            weeklySchedule = weeklySchedule.split('');
+            console.log(weeklySchedule)
+
+            // FIX TUESDAY AND THURSDAY CONFUSION
+            for (let j = 0; j < weeklySchedule.length; j++) {
+                if (weeklySchedule[j] == 'T' && weeklySchedule[j + 1] == 'H') {
+                    console.log('thursday')
+                    weeklySchedule.push("TH")
+                }
+
+                console.log(weeklySchedule)
+
+                switch (weeklySchedule[j]) {
+                    case 'M':
+                        byDay.push("MO")
+                        break;
+                    case 'T':
+                        if (weeklySchedule[j+1] == 'H') {
+                            break;
+                        }
+                        byDay.push("TU")
+                        break;
+                    case 'W':
+                        byDay.push("WE")
+                        break;
+                    case 'TH':
+                        byDay.push("TH")
+                        break;
+                    case 'F':
+                        byDay.push("FR")
+                        break;
+                    case 'S': // SATURDAY (Sundays for graduate students are not yet handled)
+                        byDay.push("SA")
+                        break;
+                } 
+            }
+
+        }
+
+        console.log(byDay)
+        classSchedule += byDay + ";"
+
+        // UNTIL
+        classSchedule += "UNTIL=20261217T110000Z\n" // hardcoded for now; improve later
+
+        // DTEND
+        let endTimeString = scheduleElements[4].substring(7, 11)
+        console.log(endTimeString)
+
+        let endTime = Number(endTimeString)
+
+        if (scheduleElements[4].substring(12, 14) == "PM") { // Either PM only or overlapping AM/PM
+            if (endTime < 1200 && endTime > 830) {  // am pm is not really the case here, its the 24-hour format
+                // am. do nothing
+            } else if (endTime >= 1200 && endTime <= 1259) {
+                // do nothing
+            } else { // pm
+                endTime += 1200
+            }
+        }
+
+        endTimeString = endTime.toString()
+
+        classSchedule += "DTEND;TZID=Asia/Manila:"
+
+        let dtEnd = icsDate.substring(0,8)
+
+        console.log(endTimeString)
+        dtEnd += 'T' + endTimeString + "00"
+        console.log(dtEnd)
+        classSchedule += dtEnd
+
+        // SUMMARY
+        let summary = scheduleElements[1] + " (" + scheduleElements[0] + ")"
+        console.log(summary)
+        classSchedule += "\nSUMMARY:" + summary 
+
+        // DESCRIPTION
+        let description = scheduleElements[2]
+        classSchedule += "\nDESCRIPTION:" + description
+
+        // LOCATION
+        let location = scheduleElements[6]
+        classSchedule += "\nLOCATION:" + location
+
+        classSchedule += "\nEND:VEVENT"
     }
 
+    classSchedule += "\nEND:VCALENDAR"
 
+    console.log(classSchedule)
 
     // this can be a separate function that can be used in all export buttons? since repetitive
     const icsBlob = new Blob([classSchedule], { type: 'text/calendar'});
