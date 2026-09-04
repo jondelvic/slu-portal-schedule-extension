@@ -271,7 +271,7 @@ END:VEVENT
 
 
 // DTSTAMP
-let icsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000 + 86400000).toISOString() // source: https://stackoverflow.com/a/76621138
+let icsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString() // source: https://stackoverflow.com/a/76621138
 icsDate = icsDate.replace(/-/g, '')
 icsDate = icsDate.replace(/:/g, '')
 icsDate = icsDate.replace(/\.\d+/, '')
@@ -332,16 +332,20 @@ function exportToICS() {
         let startTime = Number(startTimeString)
 
         if (scheduleElements[4].substring(12, 14) == "PM") { // Either PM only or overlapping AM/PM
-            if (startTime < 1200 && startTime > 830) {  // am pm is not really the case here, its the 24-hour format
+            if (startTime < 1200 && startTime > 700) {  // am pm is not really the case here, its the 24-hour format
                 // am. do nothing
+                if (startTime < 1000) {
+                    startTimeString += "0" + startTime.toString()
+                    console.log(startTimeString)
+                }
             } else if (startTime >= 1200 && startTime <= 1259) {
-                // do nothing
+
             } else { // pm
                 startTime += 1200
             }
-        }
 
-        startTimeString = startTime.toString()
+            startTimeString = startTime.toString()
+        }
 
         console.log(startTimeString)
         dtStart += 'T' + startTimeString + "00"
@@ -350,7 +354,7 @@ function exportToICS() {
 
         dtStart = icsDate.substring(0,8) // reset dtstart per loop iteration; 
 
-        classSchedule += "\nRRULE:FREQ=WEEKLY;BYDAY=" // insert days here
+        classSchedule += "\nRRULE:FREQ=WEEKLY;WKST=SU;BYDAY=" // insert days here
 
         // TODO: EXDATE; We're currently having issues with the datestart since even if it's not part of by day, the schedules get imported. i think google calendar fixed this using EXDATE?
         days.push(scheduleElements[5])
@@ -416,16 +420,17 @@ function exportToICS() {
         let endTime = Number(endTimeString)
 
         if (scheduleElements[4].substring(12, 14) == "PM") { // Either PM only or overlapping AM/PM
-            if (endTime < 1200 && endTime > 830) {  // am pm is not really the case here, its the 24-hour format
-                // am. do nothing
-            } else if (endTime >= 1200 && endTime <= 1259) {
-                // do nothing
-            } else { // pm
+            if (endTime >= 1200 && endTime <= 1259) {
+                // do nothign
+            } else {
                 endTime += 1200
             }
+            endTimeString = endTime.toString()
+        } else {
+            if (endTime < 1000) {
+                endTimeString += "0" + endTime.toString()
+            }
         }
-
-        endTimeString = endTime.toString()
 
         classSchedule += "DTEND;TZID=Asia/Manila:"
 
